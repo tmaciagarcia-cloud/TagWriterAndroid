@@ -10,7 +10,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Título -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,12 +22,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sistema de gestión de palmeras"
+            android:text="Sistema de gestion de palmeras"
             android:textSize="13sp"
             android:textColor="#888888"
             android:layout_marginBottom="20dp"/>
 
-        <!-- Botón de modo -->
         <Button
             android:id="@+id/btnModo"
             android:layout_width="match_parent"
@@ -38,21 +36,29 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Estado -->
+        <TextView
+            android:id="@+id/tvInstruccion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:textColor="#555555"
+            android:layout_marginBottom="8dp"/>
+
         <TextView
             android:id="@+id/tvEstado"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:gravity="center"
-            android:padding="12dp"
+            android:padding="10dp"
             android:background="#FFFFFF"
             android:layout_marginBottom="16dp"
             android:textColor="#333333"/>
 
-        <!-- Contenido actual del tag -->
+        <!-- Contenido editable del tag -->
         <LinearLayout
-            android:id="@+id/cardContenido"
+            android:id="@+id/layoutContenido"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -64,63 +70,28 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="CONTENIDO ACTUAL DEL TAG"
-                android:textSize="11sp"
-                android:textColor="#888888"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="8dp"/>
-
-            <TextView
-                android:id="@+id/tvContenidoActual"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textColor="#1A1A1A"
-                android:fontFamily="monospace"/>
-        </LinearLayout>
-
-        <!-- Campo línea de gestión -->
-        <LinearLayout
-            android:id="@+id/layoutGestion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#FFFFFF"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="LÍNEA DE GESTIÓN A AÑADIR"
+                android:text="CONTENIDO DEL TAG (editable)"
                 android:textSize="11sp"
                 android:textColor="#888888"
                 android:letterSpacing="0.1"
                 android:layout_marginBottom="8dp"/>
 
             <EditText
-                android:id="@+id/etGestionInput"
+                android:id="@+id/etContenido"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ej: TA, QH, V..."
-                android:textSize="16sp"
-                android:inputType="text"
+                android:minLines="3"
+                android:gravity="top"
+                android:textSize="14sp"
+                android:textColor="#1A1A1A"
+                android:fontFamily="monospace"
                 android:background="@null"
-                android:textColor="#1A1A1A"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TA=Tala · QH=Quitar hijuelos · V=Vigilancia"
-                android:textSize="11sp"
-                android:textColor="#AAAAAA"
-                android:layout_marginTop="4dp"/>
+                android:inputType="textMultiLine"
+                android:scrollHorizontally="false"/>
         </LinearLayout>
 
         <!-- Contraseña -->
         <LinearLayout
-            android:id="@+id/layoutPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -131,7 +102,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="CONTRASEÑA DEL TAG (8 caracteres hex)"
+                android:text="CONTRASENA DEL TAG (8 caracteres hex)"
                 android:textSize="11sp"
                 android:textColor="#888888"
                 android:letterSpacing="0.1"
@@ -141,7 +112,7 @@
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ej: 74726167"
+                android:hint="Ej: 6A8DCBB4"
                 android:textSize="16sp"
                 android:inputType="textNoSuggestions"
                 android:fontFamily="monospace"
@@ -152,7 +123,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Deja vacío si el tag no tiene contraseña"
+                android:text="Deja vacio si el tag no tiene contrasena"
                 android:textSize="11sp"
                 android:textColor="#AAAAAA"
                 android:layout_marginTop="4dp"/>
@@ -161,7 +132,7 @@
                 android:id="@+id/btnGuardarPwd"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="Guardar contraseña"
+                android:text="Guardar contrasena"
                 android:textSize="12sp"
                 android:layout_marginTop="8dp"
                 android:backgroundTint="#EEEEEE"
