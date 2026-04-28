@@ -1,46 +1,33 @@
-name: Build TagWriter IPA
+name: Build TagWriter APK
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:   # permite lanzarlo manualmente desde la web de GitHub
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-14   # macOS con Xcode 15
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
 
-      - name: Seleccionar Xcode 15
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-      - name: Build sin firma (para Sideloadly)
-        run: |
-          xcodebuild \
-            -project TagWriter.xcodeproj \
-            -scheme TagWriter \
-            -configuration Release \
-            -sdk iphoneos \
-            -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            build
+      - name: Dar permisos a gradlew
+        run: chmod +x gradlew
 
-      - name: Empaquetar en .ipa
-        run: |
-          APP_PATH=$(find build -name "*.app" | head -1)
-          mkdir -p Payload
-          cp -r "$APP_PATH" Payload/
-          zip -r TagWriter.ipa Payload
-          echo "IPA generado: $(ls -lh TagWriter.ipa)"
+      - name: Build APK
+        run: ./gradlew assembleRelease
 
-      - name: Subir IPA como artefacto
+      - name: Subir APK
         uses: actions/upload-artifact@v4
         with:
-          name: TagWriter-IPA
-          path: TagWriter.ipa
+          name: TagWriter-APK
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
           retention-days: 30
-
