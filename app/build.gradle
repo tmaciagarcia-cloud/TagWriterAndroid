@@ -5,6 +5,7 @@ plugins {
 
 android {
     compileSdkVersion 34
+    namespace "com.tagwriter.nfc"
     defaultConfig {
         applicationId "com.tagwriter.nfc"
         minSdkVersion 21
