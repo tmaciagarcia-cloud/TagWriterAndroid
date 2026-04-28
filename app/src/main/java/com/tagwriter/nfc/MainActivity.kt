@@ -22,16 +22,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var prefs: SharedPreferences
 
     private lateinit var tvEstado: TextView
-    private lateinit var tvContenidoActual: TextView
-    private lateinit var etGestion: EditText
-    private lateinit var layoutGestion: View
+    private lateinit var etContenido: EditText
+    private lateinit var layoutContenido: View
     private lateinit var etPassword: EditText
     private lateinit var btnModo: Button
-    private lateinit var cardContenido: View
+    private lateinit var tvInstruccion: TextView
 
     private enum class Modo { LEER, ESCRIBIR }
     private var modoActual = Modo.LEER
-    private var textoActual = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,13 +38,12 @@ class MainActivity : AppCompatActivity() {
         prefs = getSharedPreferences("tagwriter", MODE_PRIVATE)
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
-        tvEstado          = findViewById(R.id.tvEstado)
-        tvContenidoActual = findViewById(R.id.tvContenidoActual)
-        etGestion         = findViewById(R.id.etGestionInput)
-        layoutGestion     = findViewById(R.id.layoutGestion)
-        etPassword        = findViewById(R.id.etPassword)
-        btnModo           = findViewById(R.id.btnModo)
-        cardContenido     = findViewById(R.id.cardContenido)
+        tvEstado      = findViewById(R.id.tvEstado)
+        etContenido   = findViewById(R.id.etContenido)
+        layoutContenido = findViewById(R.id.layoutContenido)
+        etPassword    = findViewById(R.id.etPassword)
+        btnModo       = findViewById(R.id.btnModo)
+        tvInstruccion = findViewById(R.id.tvInstruccion)
 
         etPassword.setText(prefs.getString("password", ""))
 
@@ -84,6 +81,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ── LEER ──────────────────────────────────────────────────────────
+
     private fun leerTag(tag: Tag) {
         try {
             val ndef = Ndef.get(tag) ?: run {
@@ -94,26 +93,27 @@ class MainActivity : AppCompatActivity() {
             val message = ndef.ndefMessage
             ndef.close()
 
-            if (message != null && message.records.isNotEmpty()) {
-                textoActual = parsearTexto(message.records[0])
-                runOnUiThread {
-                    tvContenidoActual.text = textoActual
-                    cardContenido.visibility = View.VISIBLE
-                    mostrarEstado("Tag leido - acerca de nuevo para escribir", verde = true)
-                    cambiarModo(Modo.ESCRIBIR)
-                }
-            } else {
-                runOnUiThread { mostrarEstado("Tag vacio", verde = false) }
+            val texto = if (message != null && message.records.isNotEmpty())
+                parsearTexto(message.records[0]) else ""
+
+            runOnUiThread {
+                etContenido.setText(texto)
+                etContenido.setSelection(texto.length) // cursor al final
+                layoutContenido.visibility = View.VISIBLE
+                mostrarEstado("Tag leido - edita y acerca de nuevo para escribir", verde = true)
+                cambiarModo(Modo.ESCRIBIR)
             }
         } catch (e: Exception) {
             runOnUiThread { mostrarEstado("Error al leer: ${e.message}", verde = false) }
         }
     }
 
+    // ── ESCRIBIR ──────────────────────────────────────────────────────
+
     private fun escribirTag(tag: Tag) {
-        val linea = etGestion.text.toString().trim()
-        if (linea.isEmpty()) {
-            runOnUiThread { mostrarEstado("Escribe la linea de gestion primero", verde = false) }
+        val nuevoTexto = etContenido.text.toString().trim()
+        if (nuevoTexto.isEmpty()) {
+            runOnUiThread { mostrarEstado("El contenido no puede estar vacio", verde = false) }
             return
         }
 
@@ -134,7 +134,6 @@ class MainActivity : AppCompatActivity() {
                     setAuth0(mifare, 0xFF.toByte())
                 }
 
-                val nuevoTexto = if (textoActual.isNotEmpty()) "$textoActual $linea" else linea
                 escribirNDEF(mifare, nuevoTexto)
 
                 if (pwd != null) {
@@ -145,10 +144,7 @@ class MainActivity : AppCompatActivity() {
                 mifare.close()
 
                 runOnUiThread {
-                    mostrarEstado("Tag escrito correctamente en 1 tap!", verde = true)
-                    etGestion.setText("")
-                    textoActual = nuevoTexto
-                    tvContenidoActual.text = nuevoTexto
+                    mostrarEstado("Tag escrito correctamente!", verde = true)
                     cambiarModo(Modo.LEER)
                 }
             } catch (e: Exception) {
@@ -156,6 +152,8 @@ class MainActivity : AppCompatActivity() {
             }
         }.start()
     }
+
+    // ── COMANDOS NFC ──────────────────────────────────────────────────
 
     private fun pwdAuth(tag: MifareUltralight, pwd: ByteArray): Boolean {
         return try {
@@ -231,14 +229,13 @@ class MainActivity : AppCompatActivity() {
             Modo.LEER -> {
                 btnModo.text = "Modo: LEER TAG"
                 btnModo.setBackgroundColor(ContextCompat.getColor(this, R.color.azul))
-                tvEstado.text = "Acerca el tag para leer su contenido"
-                layoutGestion.visibility = View.GONE
+                tvInstruccion.text = "Acerca el tag para leer y editar su contenido"
+                layoutContenido.visibility = View.GONE
             }
             Modo.ESCRIBIR -> {
                 btnModo.text = "Modo: ESCRIBIR TAG"
                 btnModo.setBackgroundColor(ContextCompat.getColor(this, R.color.verde))
-                tvEstado.text = "Escribe la linea de gestion y acerca el tag"
-                layoutGestion.visibility = View.VISIBLE
+                tvInstruccion.text = "Edita el texto y acerca el tag para escribir"
             }
         }
     }
