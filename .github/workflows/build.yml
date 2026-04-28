@@ -1,1 +1,46 @@
+name: Build TagWriter IPA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # permite lanzarlo manualmente desde la web de GitHub
+
+jobs:
+  build:
+    runs-on: macos-14   # macOS con Xcode 15
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Seleccionar Xcode 15
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      - name: Build sin firma (para Sideloadly)
+        run: |
+          xcodebuild \
+            -project TagWriter.xcodeproj \
+            -scheme TagWriter \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Empaquetar en .ipa
+        run: |
+          APP_PATH=$(find build -name "*.app" | head -1)
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+          zip -r TagWriter.ipa Payload
+          echo "IPA generado: $(ls -lh TagWriter.ipa)"
+
+      - name: Subir IPA como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: TagWriter-IPA
+          path: TagWriter.ipa
+          retention-days: 30
 
